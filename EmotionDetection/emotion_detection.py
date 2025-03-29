@@ -29,6 +29,16 @@ def get_dominant_emotion(emotion_dict):
     emotion_with_max_value = max(emotion_dict, key=emotion_dict.get)
     return emotion_with_max_value
 
+def get_empty_response():
+    return {
+        'anger': None,
+        'disgust': None,
+        'fear': None,
+        'joy': None,
+        'sadness': None,
+        'dominant_emotion': None
+    }
+
 # Function: Emotion Detector
 def emotion_detector(text_to_analyse):
     '''
@@ -47,14 +57,17 @@ def emotion_detector(text_to_analyse):
     # Parsing the JSON response from the API
     formatted_response = json.loads(response.text)
 
-    # Call function to get emotion and scores
-    emotion_dict = get_parsed_emotion(formatted_response)
+    if response.status_code == 200:
+        # Call function to get emotion and scores
+        emotion_dict = get_parsed_emotion(formatted_response)
 
-    # Call function to get dominant emotion
-    emotion_with_max_value = get_dominant_emotion(emotion_dict)
+        # Call function to get dominant emotion
+        emotion_with_max_value = get_dominant_emotion(emotion_dict)
 
-    # Add the dominant emotion to the dictonary
-    emotion_dict['dominant_emotion'] = emotion_with_max_value
+        # Add the dominant emotion to the dictonary
+        emotion_dict['dominant_emotion'] = emotion_with_max_value
+    elif response.status_code == 400:
+        emotion_dict = get_empty_response()
 
     # Return JSON
-    return json.dumps(emotion_dict)
+    return emotion_dict
